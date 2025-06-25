@@ -124,6 +124,17 @@
     }
   </style>
 </head>
+  <div id="startPage">
+  <h2>مرحبًا بك في اختبار علم الصرف</h2>
+  <label for="studentName">👤 أدخل اسمك:</label>
+  <input type="text" id="studentName" placeholder="اسم الطالب" required>
+  <br><br>
+  <button onclick="startQuiz()">ابدأ الاختبار</button>
+</div>
+
+<div id="quizPage" style="display:none;">
+  <!-- Kuiz bermula di sini -->
+</div>
 <body>
   <div class="quiz-container">
     <h2>كويز تفاعلي في علم الصرف - المستوى الأول</h2>
@@ -272,6 +283,62 @@ function showScore() {
     body: JSON.stringify(payload)
   });
 }
+    <script>
+  let studentName = "";
+
+  // Fungsi untuk dapatkan gred berdasarkan skor
+  function getGrade(score) {
+    const total = quizData.length;
+    const percentage = (score / total) * 100;
+    if (percentage >= 90) return "🌟 ممتاز جدًا";
+    if (percentage >= 75) return "✅ جيد جدًا";
+    if (percentage >= 60) return "👍 مقبول";
+    return "⚠️ تحتاج إلى مراجعة";
+  }
+
+  // Fungsi untuk simpan data ke Google Sheet
+  function saveToGoogleSheet() {
+    const url = "https://script.google.com/macros/s/AKfycbxjlbIc3_wg8sit1oJut3ljZwQ89ZC4n3A5tcyfkUptCVcay13N6LY4e45ScUcOTJ8/exec";
+    const payload = {
+      name: studentName || "بدون اسم",
+      score: `${score}/${quizData.length}`,
+      grade: getGrade(score)
+    };
+
+    fetch(url, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+  }
+
+  // Fungsi akhir selepas semua soalan dijawab
+  function showScore() {
+    const grade = getGrade(score);
+    document.getElementById("score").innerText = `📊 نتيجتك النهائية: ${score} من ${quizData.length} سؤال.`;
+    document.getElementById("grade").innerText = grade;
+    document.getElementById("studentDisplay").innerText = `👤 اسم الطالب: ${studentName || "(لم يتم إدخال الاسم)"}`;
+    document.getElementById("certificate").style.display = "block";
+
+    saveToGoogleSheet(); // ✅ Simpan ke Google Sheet
+  }
+
+  // Fungsi permulaan – dapatkan nama pelajar
+  function startQuiz() {
+    studentName = document.getElementById("studentName").value.trim();
+    if (!studentName) {
+      alert("Sila masukkan nama anda.");
+      return;
+    }
+    document.getElementById("startPage").style.display = "none";
+    document.getElementById("quizPage").style.display = "block";
+    showQuestion();
+  }
+</script>
+
   </script>
 </body>
 </html>
