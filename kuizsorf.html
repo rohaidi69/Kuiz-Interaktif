@@ -227,6 +227,17 @@
       document.getElementById("studentDisplay").innerText = `👤 اسم الطالب: ${studentName || "(لم يتم إدخال الاسم)"}`;
       document.getElementById("certificate").style.display = "block";
     }
+    
+function showScore() {
+  const scoreDiv = document.getElementById("score");
+  const grade = getGrade(score);
+  scoreDiv.innerText = `📊 نتيجتك النهائية: ${score} من ${quizData.length} سؤال.`;
+  document.getElementById("grade").innerText = grade;
+  document.getElementById("studentDisplay").innerText = `👤 اسم الطالب: ${studentName || "(لم يتم إدخال الاسم)"}`;
+  document.getElementById("certificate").style.display = "block";
+
+  saveToGoogleSheet(); // <-- Tambah baris ini
+}
 
     function nextQuestion() {
       if (currentQuestion < quizData.length - 1) {
@@ -243,6 +254,24 @@
     }
 
     window.onload = loadQuestion;
+    
+    function saveToGoogleSheet() {
+  const url = "URL_WEB_APP_GOOGLE_SCRIPT"; // Ganti dengan URL sebenar anda
+  const payload = {
+    name: studentName || "Tanpa Nama",
+    score: `${score}/${quizData.length}`,
+    grade: getGrade(score)
+  };
+
+  fetch(url, {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+}
   </script>
 </body>
 </html>
